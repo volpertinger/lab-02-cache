@@ -62,7 +62,8 @@ int main() {
 
     std::cout << "-------------------------------------------------------------"
               << std::endl
-              << "Investigation: 1/2 L1 (buffer size=" << size << ")" << std::endl
+              << "Investigation: 1/2 L1 (buffer size=" << size << ")"
+              << std::endl
               << "-Number of experiments: " << experimnets_number << std::endl
               << "-Travel Variant:" << std::endl
               << "--Straight:" << std::endl
@@ -199,6 +200,67 @@ int main() {
   {
     std::srand(std::time(nullptr));
     size_t size = 2097152;
+    int* array = new int[size];
+    // filling
+    for (size_t i = 0; i < size; ++i) array[i] = std::rand() % 100000;
+
+    // experiment
+
+    // warming up
+    for (size_t i = 0; i < size; i += 16) ++array[i];
+
+    // direct
+    auto start = std::chrono::steady_clock::now();
+    for (size_t j = 0; j < experimnets_number; ++j) {
+      for (size_t i = 0; i < size; ++i) ++array[i];
+    }
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> duration_direct = end - start;
+
+    // warming up
+    for (size_t i = 0; i < size; i += 16) ++array[i];
+
+    // back
+    start = std::chrono::steady_clock::now();
+    for (size_t j = 0; j < experimnets_number; ++j) {
+      for (size_t i = size; i > 0; --i) ++array[i];
+    }
+    end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> duration_back = end - start;
+
+    // warming up
+    for (size_t i = 0; i < size; i += 16) ++array[i];
+
+    // random
+
+    start = std::chrono::steady_clock::now();
+    for (size_t j = 0; j < experimnets_number; ++j) {
+      for (size_t i = 0; i < size; ++i) ++array[std::rand() % size];
+    }
+    end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> duration_random = end - start;
+
+    delete[] array;
+
+    // answer
+
+    std::cout << "-------------------------------------------------------------"
+              << std::endl
+              << "Investigation:L3 (buffer size=" << size << ")" << std::endl
+              << "-Number of experiments: " << experimnets_number << std::endl
+              << "-Travel Variant:" << std::endl
+              << "--Straight:" << std::endl
+              << "---Duration : " << duration_direct.count() << std::endl
+              << "--Back:" << std::endl
+              << "---Duration: " << duration_back.count() << std::endl
+              << "--Random:" << std::endl
+              << "---Duration: " << duration_random.count() << std::endl;
+  }
+
+  // 3/2 L3
+  {
+    std::srand(std::time(nullptr));
+    size_t size = 3145728;
     int* array = new int[size];
     // filling
     for (size_t i = 0; i < size; ++i) array[i] = std::rand() % 100000;
